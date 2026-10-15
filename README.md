@@ -1,9 +1,12 @@
 # The Groove Studio
 
-**Free music tools for Windows, made by musicians for musicians.**
-Split songs into parts to learn them, record your takes, program drums, and mix and master, all on your own PC, with no account, no subscription and no uploads.
+**Free music tools for musicians who'd rather make music than fight their software.**
 
 **[⬇ Download the latest version](../../releases/latest)** · Windows 10 or 11 (64-bit) · Free
+
+Most music software assumes a powerful computer, a pricey subscription, or both. The Groove Studio doesn't. Its recording, drum and mastering tools are built on lightweight web technology, the same engine your browser uses for audio, so they start instantly and run smoothly on everyday computers. Even the AI song splitter runs on an ordinary processor, with no graphics card required.
+
+Split any song into vocals, guitar, piano, bass and drums to learn your part. Record your takes and send them to your bandmates. Program beats for ACID Pro. Then mix and master the finished track for streaming. It all happens on your own PC: no account, no uploads, no subscription.
 
 ---
 
@@ -52,4 +55,4 @@ ACID Pro is a trademark of MAGIX Software GmbH. The Groove Studio is not affilia
 Questions, bug reports or licence requests: **groove@thegroove.net**
 Website: **[thegroove.net](https://thegroove.net)**
 
-*Made by Stevis & The Groove.*
+*Made by Stevis & The Groove, a band that's been making music for over 25 years.*
