@@ -1,0 +1,1294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mastering Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Nunito:wght@400;600;700&family=Oswald:wght@500;600;700&display=swap">
+<style>
+:root{
+  --bg:#120626; --panel:#1A0A36; --panel2:#241045; --line:#2E1858; --line2:#3D2470; --text:#F1ECFA; --muted:#A99BC4;
+  --accent:#B0ED0F; --accent-hi:#C4FF2E; --on-accent:#142000; --accent2:#C9A2FF; --on-accent2:#1A0A36; --danger:#FF8A3D; --lane:#160830;
+  --display:'Oswald','Arial Narrow',sans-serif; --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:13px/1.45 "Nunito",system-ui,"Segoe UI",sans-serif}
+button,select,input{font:inherit;color:inherit}
+.btn{background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:6px 11px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:700}
+.btn.primary:hover{background:var(--accent-hi)}
+.btn.sm{padding:2px 7px;font-size:11px;border-radius:4px}
+.btn.on.m{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.on.s{background:var(--accent2);border-color:var(--accent2);color:var(--on-accent2)}
+.btn.on.fx,.btn.on.nr{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.on.ab{background:var(--accent2);border-color:var(--accent2);color:var(--on-accent2)}
+.btn:disabled{opacity:.45;cursor:default}
+select,input[type=text],input[type=number]{background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:5px 8px}
+input[type=range]{accent-color:var(--accent);width:100%;min-width:0}
+
+.top{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#2C0785;border-bottom:1px solid #3D1A9E;flex-wrap:wrap}
+.top .btn:not(.primary):not(.on),.top select{background:#22066B;border-color:#4A25B0}
+.top .btn:not(.primary):not(.on):hover{border-color:var(--accent)}
+.brand{display:flex;align-items:center;gap:10px;margin-right:8px}
+.brand .wordmark{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);line-height:1;white-space:nowrap}
+.brand .site{font-size:12px;color:#C9B8F5;text-decoration:none}
+.brand .site:hover{color:var(--accent)}
+.sep{width:1px;height:24px;background:#4A25B0}
+.tips{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;padding:7px 16px;background:#1F0B45;border-bottom:1px solid var(--line2);font-size:12.5px;color:#C8BCE0}
+.tips[hidden]{display:none}
+.tips b{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.tips kbd{font-family:var(--mono);font-size:11px;background:var(--panel2);border:1px solid var(--line2);border-radius:4px;padding:0 5px;color:var(--text)}
+.tips .x{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 4px}
+.tips .x:hover{color:var(--text)}
+.time{font-variant-numeric:tabular-nums;font-family:var(--mono);background:#1A0559;border:1px solid #4A25B0;border-radius:6px;padding:5px 10px;min-width:130px;text-align:center}
+.grow{flex:1}
+
+.app{display:grid;grid-template-columns:1fr 370px;height:calc(100vh - 55px)}
+.tracks-pane{overflow:auto;position:relative}
+.master-pane{overflow:auto;border-left:1px solid var(--line);background:var(--panel);padding:14px}
+
+.ruler-row{display:grid;grid-template-columns:340px 1fr;height:26px;position:sticky;top:0;z-index:3;background:var(--panel);border-bottom:1px solid var(--line)}
+.ruler-row .lbl{padding:4px 12px;color:#9585B5;font-size:11px;text-transform:uppercase;letter-spacing:.8px}
+#ruler{width:100%;height:26px;display:block;cursor:pointer}
+
+.track{display:grid;grid-template-columns:340px 1fr;border-bottom:1px solid var(--line);min-height:96px}
+.tctl{background:var(--panel);padding:8px 10px;border-left:4px solid var(--c);display:flex;flex-direction:column;gap:5px}
+.trow{display:flex;gap:5px;align-items:center}
+.tname{flex:1;min-width:0;background:transparent!important;border:1px solid transparent!important;padding:2px 4px!important;font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.01em}
+.tname:focus{border-color:var(--line2)!important;outline:none}
+.tlane{position:relative;background:var(--lane);cursor:pointer;min-height:96px}
+.tlane canvas{position:absolute;inset:0;width:100%;height:100%}
+.playhead{position:absolute;top:0;bottom:0;width:2px;background:var(--accent2);pointer-events:none;left:0;box-shadow:0 0 6px rgba(201,162,255,.6)}
+.badge{position:absolute;top:6px;right:8px;font-size:10px;font-weight:700;letter-spacing:.6px;padding:2px 6px;border-radius:4px;background:rgba(176,237,15,.15);color:var(--accent);pointer-events:none}
+.fx{display:grid;grid-template-columns:1fr 1fr;gap:3px 12px;padding-top:4px;border-top:1px dashed var(--line);margin-top:2px}
+.fx[hidden]{display:none}
+.fx .full{grid-column:1/-1;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+.ctl{display:grid;grid-template-columns:62px 1fr 62px;align-items:center;gap:6px;font-size:12px}
+.ctl[hidden]{display:none}
+.ctl .cl{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;user-select:none}
+.ctl .cl:hover{color:var(--text)}
+.ctl .cv{font-variant-numeric:tabular-nums;text-align:right;font-size:11px;white-space:nowrap}
+
+.empty{margin:40px auto;max-width:560px;border:2px dashed #4A3380;border-radius:16px;background:var(--panel);padding:46px 30px;text-align:center;color:var(--muted)}
+.empty h2{color:var(--text);margin:0 0 8px;font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:.01em}
+.empty .row{display:flex;gap:10px;justify-content:center;margin-top:18px}
+body.drag .tracks-pane{outline:2px dashed var(--accent);outline-offset:-8px}
+
+.mhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.mhead h2{margin:0;font-family:var(--display);font-weight:600;font-size:20px;letter-spacing:.02em}
+.card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:10px}
+.card h3{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.card .ctl{margin:3px 0}
+.readouts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.readouts div{background:var(--lane);border-radius:6px;padding:6px 8px}
+.readouts b{font-family:var(--mono);font-weight:600;font-size:18px;font-variant-numeric:tabular-nums;display:block}
+.readouts small{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.6px}
+#meter,#spectrum{width:100%;display:block;border-radius:6px;background:var(--lane)}
+#meter{height:34px}
+#spectrum{height:110px}
+.card h3 .right{display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0;font-weight:400}
+.card h3 select{padding:2px 6px;font-size:11px}
+.mbband{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line)}
+.mbhead{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:2px}
+.mbhead b{font-weight:600;width:34px}
+.mbhead .rng{color:var(--muted);font-size:11px;width:92px;white-space:nowrap}
+.gr{flex:1;height:6px;background:var(--lane);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end}
+.gr i{display:block;height:100%;width:0;background:var(--accent2)}
+.grt{font-size:10px;color:var(--muted);width:46px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mboff .mbband,.mboff .ctl{opacity:.45}
+.offs{width:84px}
+.analysis{font-size:12px;color:var(--muted);margin-bottom:8px;min-height:18px}
+.analysis b{color:var(--text)}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap}
+.hint{font-size:11px;color:var(--muted);margin-top:6px}
+
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line2);border-radius:16px;padding:18px 20px;width:min(440px,92vw)}
+dialog::backdrop{background:rgba(10,3,24,.7)}
+dialog h3{font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:.02em}
+dialog h3{margin:0 0 4px}
+dialog p{color:var(--muted);margin:0 0 12px;font-size:12px}
+dialog .ctl{grid-template-columns:96px 1fr 62px;margin:6px 0}
+dialog .field{display:grid;grid-template-columns:96px 1fr;gap:6px;align-items:center;margin:8px 0}
+dialog .field>span{color:var(--muted);font-size:12px}
+dialog .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.prog{height:6px;background:var(--lane);border-radius:3px;overflow:hidden;margin-top:10px}
+.prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .1s}
+
+#busy{position:fixed;inset:0;background:rgba(10,3,24,.7);display:flex;align-items:center;justify-content:center;z-index:50}
+#busy[hidden]{display:none}
+#busy .box{background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:18px 22px;min-width:280px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--accent);padding:9px 14px;border-radius:8px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60;max-width:90vw}
+#toast.show{opacity:1}
+
+@media (min-width:981px){
+  body{display:flex;flex-direction:column}
+  .top,.tips{flex:none}
+  .app{flex:1;min-height:0;height:auto}
+}
+@media (max-width:1500px){ .brand .site{display:none} }
+@media (max-width:980px){
+  .app{grid-template-columns:1fr;height:auto}
+  .master-pane{border-left:0;border-top:1px solid var(--line)}
+  .track,.ruler-row{grid-template-columns:1fr}
+  .ruler-row .lbl{display:none}
+  .tlane{min-height:80px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#B0ED0F" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M3 13v0M7 8v10M11 4v18M15 9v8M19 6v14M23 11v4"/></svg>
+    <span class="wordmark">Mastering Studio</span>
+    <a class="site" href="https://thegroove.net" target="_blank" rel="noopener">thegroove.net</a>
+  </div>
+  <button class="btn" id="addBtn">+ Add tracks</button>
+  <button class="btn" id="demoBtn">Load demo</button>
+  <input type="file" id="fileIn" accept="audio/*,.wav,.mp3,.flac,.ogg,.m4a,.aac,.aif,.aiff" multiple hidden>
+  <div class="sep"></div>
+  <button class="btn" id="openBtn" title="Open a saved .msproj project">Open…</button>
+  <button class="btn" id="saveBtn" title="Save audio + all settings into one .msproj file">Save project</button>
+  <input type="file" id="projIn" accept=".msproj" hidden>
+  <div class="sep"></div>
+  <button class="btn" id="playBtn" title="Play / pause (Space)">▶ Play</button>
+  <button class="btn" id="stopBtn" title="Stop and return to start">■</button>
+  <div class="time" id="time">0:00.0 / 0:00.0</div>
+  <button class="btn ab" id="abBtn" title="Bypass the master chain to compare before/after">A/B: Mastered</button>
+  <div class="grow"></div>
+  <button class="btn" id="tipsBtn" title="Show or hide tips" aria-label="Show or hide tips" style="font-weight:700;padding-inline:10px">?</button>
+  <button class="btn" id="clearBtn">Clear</button>
+  <button class="btn primary" id="exportBtn">Export master…</button>
+</header>
+<div class="tips" id="tips">
+  <b>Tips</b>
+  <span>Click a fader, then use <kbd>←</kbd> <kbd>→</kbd> to fine-tune it (<kbd>Shift</kbd> + arrows for bigger steps)</span>
+  <span>Double-click a fader's name to reset it</span>
+  <span><kbd>Space</kbd> plays and pauses</span>
+  <span><kbd>Shift</kbd> + drag a waveform to slide that track in time</span>
+  <button class="x" id="tipsClose" title="Hide tips (bring them back with the ? button)">Hide ✕</button>
+</div>
+
+<main class="app">
+  <section class="tracks-pane" id="tracksPane">
+    <div class="ruler-row" id="rulerRow" hidden><div class="lbl">Tracks</div><canvas id="ruler"></canvas></div>
+    <div id="tracks"></div>
+    <div class="empty" id="empty">
+      <h2>Drop your multitrack stems here</h2>
+      <div>WAV, MP3, FLAC, OGG, M4A. Every file becomes a track, lined up at 0:00.<br>Everything is processed locally in your browser.</div>
+      <div class="row"><button class="btn primary" id="addBtn2">Choose files</button><button class="btn" id="demoBtn2">Try the demo session</button></div>
+    </div>
+  </section>
+
+  <aside class="master-pane">
+    <div class="mhead"><h2>Master bus</h2>
+      <select id="preset" title="Mastering preset"></select>
+    </div>
+    <div class="card">
+      <canvas id="meter"></canvas>
+      <div class="readouts">
+        <div><b id="lufsM">–∞</b><small>Momentary LUFS</small></div>
+        <div><b id="peakR">–∞</b><small>Peak dBFS</small></div>
+      </div>
+      <canvas id="spectrum"></canvas>
+    </div>
+    <div id="mctls"></div>
+    <div class="card">
+      <h3>Loudness analysis</h3>
+      <div class="analysis" id="analysis">Render the full master to measure integrated loudness.</div>
+      <div class="btnrow">
+        <button class="btn" id="analyzeBtn">Analyze</button>
+        <button class="btn" id="matchBtn" title="Set output gain so the limited master hits the target LUFS">Match target</button>
+      </div>
+      <div class="hint">The playback limiter is an approximation. Export uses a true look‑ahead peak limiter.</div>
+    </div>
+  </aside>
+</main>
+
+<dialog id="nrDlg">
+  <h3>Noise reduction: <span id="nrName"></span></h3>
+  <p>Spectral noise reduction learns a noise fingerprint, then removes it from the whole track. Use it for hiss, fan noise, room tone and amp buzz.</p>
+  <div id="nrCtls"></div>
+  <div class="field"><span>Noise profile</span>
+    <select id="nrProfile">
+      <option value="auto">Auto: learn from the quietest parts</option>
+      <option value="first">First N seconds (noise only)</option>
+    </select></div>
+  <div id="nrFirstWrap"></div>
+  <div class="prog" id="nrProg" hidden><i></i></div>
+  <div class="hint" id="nrInfo"></div>
+  <div class="actions">
+    <button class="btn" id="nrRemove">Remove NR</button>
+    <div class="grow"></div>
+    <button class="btn" id="nrCancel">Close</button>
+    <button class="btn primary" id="nrApply">Apply</button>
+  </div>
+</dialog>
+
+<dialog id="exDlg">
+  <h3>Export master</h3>
+  <p>Renders every track through its own effects and the master chain, then applies the look‑ahead limiter.</p>
+  <div class="field"><span>File name</span><input type="text" id="exName" value="master"></div>
+  <div class="field"><span>Format</span>
+    <select id="exBits">
+      <option value="24">WAV 24‑bit (recommended)</option>
+      <option value="16">WAV 16‑bit (CD)</option>
+      <option value="32">WAV 32‑bit float</option>
+    </select></div>
+  <div class="field"><span>Loudness</span><label><input type="checkbox" id="exNorm" checked> Normalize to target (<span id="exTarget"></span> LUFS)</label></div>
+  <div class="field"><span>Dither</span><label><input type="checkbox" id="exDither" checked> TPDF dither (16‑bit only)</label></div>
+  <div class="hint" id="exInfo"></div>
+  <div class="actions">
+    <button class="btn" id="exCancel">Close</button>
+    <button class="btn primary" id="exGo">Render &amp; download</button>
+  </div>
+</dialog>
+
+<div id="busy" hidden><div class="box"><div id="busyMsg">Working…</div><div class="prog"><i id="busyBar"></i></div></div></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+// ---------- helpers ----------
+const $ = (s, el = document) => el.querySelector(s);
+const dbToGain = db => Math.pow(10, db / 20);
+const gainToDb = g => 20 * Math.log10(Math.max(g, 1e-12));
+const fmtTime = s => { s = Math.max(0, s); const m = Math.floor(s / 60); return m + ':' + (s - m * 60).toFixed(1).padStart(4, '0'); };
+const dbFmt = v => (v > 0 ? '+' : '') + (+v).toFixed(1) + ' dB';
+const hz = v => v >= 1000 ? (v / 1000).toFixed(v >= 10000 ? 0 : 1) + ' kHz' : Math.round(v) + ' Hz';
+const hzOff = v => v <= 20 ? 'off' : hz(v);
+const ratio = v => (+v).toFixed(1) + ':1';
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const COLORS = ['#FFB547', '#5CC8FF', '#E0B0FF', '#FF7AB6', '#3DDBD9', '#CFC6E0', '#8FA2FF', '#FF9F6B', '#B0ED0F', '#F2E27A'];
+
+function toast(msg, ms = 3200) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), ms);
+}
+function busy(msg, frac) {
+  const b = $('#busy');
+  if (msg === false) { b.hidden = true; return; }
+  b.hidden = false; $('#busyMsg').textContent = msg;
+  $('#busyBar').style.width = ((frac ?? 0) * 100) + '%';
+}
+
+function makeSlider({ label, min, max, step, value, fmt, def, onInput }) {
+  const wrap = document.createElement('div'); wrap.className = 'ctl';
+  wrap.innerHTML = `<span class="cl" title="Double-click to reset ${label}">${label}</span><input type="range" min="${min}" max="${max}" step="${step}"><span class="cv"></span>`;
+  const inp = wrap.querySelector('input'), val = wrap.querySelector('.cv');
+  inp.value = value; val.textContent = fmt(+value);
+  inp.addEventListener('input', () => { const v = +inp.value; val.textContent = fmt(v); onInput(v); });
+  // Reset to default: double-click the label (or Alt+click the slider). Clicking the slider twice no longer resets it.
+  const reset = () => { inp.value = def; inp.dispatchEvent(new Event('input')); };
+  wrap.querySelector('.cl').addEventListener('dblclick', reset);
+  inp.addEventListener('pointerdown', e => { if (e.altKey) { e.preventDefault(); reset(); } });
+  // Shift + arrow keys move 10 steps at a time (e.g. 1 dB on a volume fader)
+  inp.addEventListener('keydown', e => {
+    if (!e.shiftKey || !['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) return;
+    e.preventDefault();
+    const dir = (e.key === 'ArrowRight' || e.key === 'ArrowUp') ? 1 : -1, st = +inp.step || 1;
+    const v = Math.min(+inp.max, Math.max(+inp.min, +inp.value + dir * st * 10));
+    inp.value = +v.toFixed(4); inp.dispatchEvent(new Event('input'));
+  });
+  wrap.set = v => { inp.value = v; val.textContent = fmt(+v); };
+  return wrap;
+}
+
+// ---------- state ----------
+const MASTER_DEFAULT = { hpf: 20, lowF: 100, low: 0, midF: 1000, mid: 0, highF: 10000, high: 0, drive: 0,
+  cThr: -18, cRatio: 1, cAtk: 20, cRel: 200, makeup: 0, width: 100, outGain: 0, ceiling: -1, target: -14,
+  mbOn: 0, x1: 200, x2: 3000,
+  blThr: -24, blRat: 2, blGain: 0, bmThr: -24, bmRat: 2, bmGain: 0, bhThr: -24, bhRat: 2, bhGain: 0 };
+const PRESETS = {
+  'Neutral': {},
+  'Gentle polish': { hpf: 25, low: 1, high: 1.5, cThr: -18, cRatio: 1.8, cAtk: 30, cRel: 250, width: 108, target: -14 },
+  'Streaming loud': { hpf: 30, low: 1.5, mid: -1, midF: 350, high: 2, drive: 15, cThr: -20, cRatio: 2.5, cAtk: 15, cRel: 150, width: 112, target: -10,
+    mbOn: 1, x1: 180, x2: 4000, blThr: -22, blRat: 3, bmThr: -20, bmRat: 2, bhThr: -26, bhRat: 2.5, bhGain: 0.5 },
+  'Warm & smooth': { hpf: 25, low: 2.5, mid: -0.5, midF: 2500, high: -1.5, drive: 30, cThr: -16, cRatio: 2, cAtk: 35, cRel: 300, target: -14,
+    mbOn: 1, x1: 220, x2: 3500, blThr: -20, blRat: 1.5, bmThr: -22, bmRat: 1.5, bhThr: -28, bhRat: 3 },
+  'Bright & airy': { hpf: 30, mid: -1, midF: 300, highF: 12000, high: 3, cThr: -18, cRatio: 2, width: 115, target: -14 },
+  'Tight low end': { hpf: 30, cThr: -18, cRatio: 1.8, target: -12,
+    mbOn: 1, x1: 150, x2: 5000, blThr: -26, blRat: 4, blGain: 1, bmThr: -20, bmRat: 1.5, bhThr: -24, bhRat: 1.5 },
+  'Podcast / voice': { hpf: 80, low: -1, mid: 2, midF: 3000, high: 1, cThr: -24, cRatio: 3, cAtk: 10, cRel: 120, target: -16,
+    mbOn: 1, x1: 160, x2: 5000, blThr: -28, blRat: 2.5, bmThr: -24, bmRat: 2, bhThr: -32, bhRat: 4 },
+};
+// fixed per-band timing: lows need slower attack/release so the compressor doesn't follow individual cycles
+const MB_BANDS = [
+  { p: 'bl', name: 'Low', atk: 0.03, rel: 0.25 },
+  { p: 'bm', name: 'Mid', atk: 0.015, rel: 0.15 },
+  { p: 'bh', name: 'High', atk: 0.005, rel: 0.08 },
+];
+const MASTER_CTLS = [
+  ['EQ', [
+    ['hpf', 'Low cut', 20, 200, 1, hzOff],
+    ['low', 'Low shelf', -12, 12, 0.1, dbFmt], ['lowF', 'Low freq', 40, 400, 1, hz],
+    ['mid', 'Mid bell', -12, 12, 0.1, dbFmt], ['midF', 'Mid freq', 200, 8000, 10, hz],
+    ['high', 'High shelf', -12, 12, 0.1, dbFmt], ['highF', 'High freq', 3000, 16000, 100, hz]]],
+  ['Saturation', [['drive', 'Drive', 0, 100, 1, v => v + '%']]],
+  ['Multiband compressor', 'MB'],
+  ['Glue compressor', [
+    ['cThr', 'Threshold', -40, 0, 0.5, dbFmt], ['cRatio', 'Ratio', 1, 10, 0.1, v => v <= 1 ? 'off' : ratio(v)],
+    ['cAtk', 'Attack', 1, 100, 1, v => v + ' ms'], ['cRel', 'Release', 20, 1000, 10, v => v + ' ms'],
+    ['makeup', 'Makeup', 0, 12, 0.1, dbFmt]]],
+  ['Stereo', [['width', 'Width', 0, 200, 1, v => v === 0 ? 'mono' : v + '%']]],
+  ['Output & limiter', [
+    ['outGain', 'Gain', -24, 24, 0.1, dbFmt], ['ceiling', 'Ceiling', -6, 0, 0.1, v => (+v).toFixed(1) + ' dBFS'],
+    ['target', 'Target', -23, -6, 0.5, v => (+v).toFixed(1) + ' LUFS']]],
+];
+const TRACK_CTLS = [
+  ['hpf', 'Low cut', 20, 500, 1, hzOff, 20],
+  ['compThr', 'Comp', -40, 0, 0.5, v => v >= 0 ? 'off' : dbFmt(v), 0],
+  ['low', 'Low', -12, 12, 0.1, dbFmt, 0],
+  ['compRatio', 'Ratio', 1, 10, 0.1, ratio, 3],
+  ['mid', 'Mid', -12, 12, 0.1, dbFmt, 0],
+  ['midF', 'Mid freq', 200, 8000, 10, hz, 1000],
+  ['high', 'High', -12, 12, 0.1, dbFmt, 0],
+];
+
+const S = { tracks: [], m: { ...MASTER_DEFAULT }, playing: false, offset: 0, startAt: 0, bypass: false, mbListen: 'all' };
+let ctx = null, RT = null, nextId = 1;
+
+function ac() {
+  if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'playback' }); setupRealtime(); requestAnimationFrame(tick); }
+  return ctx;
+}
+const trackBuf = t => (t.useProc && t.proc) ? t.proc : t.orig;
+const projectDur = () => S.tracks.reduce((m, t) => Math.max(m, t.offset + t.orig.duration), 0);
+// Web Audio compressors add automatic makeup gain of ~0.6 x (static gain reduction at 0 dBFS).
+// This returns the dB that cancels it, so compressors only compress and levels stay comparable.
+// Mirrors Chromium's DynamicsCompressorKernel static curve (exponential knee + ratio) to get the exact makeup.
+const compCache = new Map();
+function compComp(thr, r, knee = 6) {
+  if (thr >= 0 || r <= 1) return 0;
+  const key = thr + '/' + r + '/' + knee; if (compCache.has(key)) return compCache.get(key);
+  const lt = dbToGain(thr), kneeDb = thr + knee, slope = 1 / r;
+  const kneeCurve = (x, k) => x < lt ? x : lt + (1 - Math.exp(-k * (x - lt))) / k;
+  const slopeAt = (x, k) => { const x2 = x * 1.001; return (gainToDb(kneeCurve(x2, k)) - gainToDb(kneeCurve(x, k))) / (gainToDb(x2) - gainToDb(x)); };
+  let lo = 0.1, hi = 10000, k = 5; const xk = dbToGain(kneeDb);
+  for (let i = 0; i < 15; i++) { if (slopeAt(xk, k) < slope) hi = k; else lo = k; k = Math.sqrt(lo * hi); }
+  const yKnee = gainToDb(kneeCurve(xk, k));
+  const y0 = kneeDb < 0 ? yKnee + slope * (0 - kneeDb) : gainToDb(kneeCurve(1, k));
+  const v = 0.6 * y0; compCache.set(key, v); return v;
+}
+const anySolo = () => S.tracks.some(t => t.solo);
+const trackLevel = t => (t.mute || (anySolo() && !t.solo)) ? 0 : dbToGain(t.gain);
+
+function setP(c, p, v) {
+  if (c instanceof OfflineAudioContext || !S.playing) { p.cancelScheduledValues(0); p.value = v; }
+  else p.setTargetAtTime(v, c.currentTime, 0.015);
+}
+// NB: Web Audio lowpass/highpass Q is in dB; 0.7071 linear (Butterworth) = -3.01 dB. Allpass/peaking/notch Q is linear.
+const Q_BUTTER = 20 * Math.log10(Math.SQRT1_2);
+function bq(c, type, f) { const n = c.createBiquadFilter(); n.type = type; if (f) n.frequency.value = f; return n; }
+function chain(...nodes) { for (let i = 0; i < nodes.length - 1; i++) nodes[i].connect(nodes[i + 1]); }
+
+// ---------- audio graph ----------
+const curveCache = {};
+function driveCurve(d) {
+  if (d <= 0) return null;
+  if (curveCache[d]) return curveCache[d];
+  const k = 1 + d / 25, n = 4096, c = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const x = i / (n - 1) * 2 - 1; c[i] = Math.tanh(k * x) / k; }
+  return (curveCache[d] = c);
+}
+
+function createMasterChain(c, withLimiter) {
+  const n = {};
+  n.input = c.createGain();
+  n.hp = bq(c, 'highpass'); n.hp.Q.value = Q_BUTTER;
+  n.low = bq(c, 'lowshelf'); n.mid = bq(c, 'peaking'); n.mid.Q.value = 0.8; n.high = bq(c, 'highshelf');
+  n.shaper = c.createWaveShaper(); n.shaper.oversample = '4x';
+  // 3-band multiband compressor with Linkwitz-Riley 24 dB/oct crossovers (bands sum back flat)
+  n.mbIn = c.createGain(); n.mbDry = c.createGain(); n.mbWet = c.createGain(); n.mbOut = c.createGain();
+  const lr4 = type => { const a = bq(c, type), b = bq(c, type); a.Q.value = b.Q.value = Q_BUTTER; a.connect(b); return [a, b]; };
+  n.x1 = [...lr4('lowpass'), ...lr4('highpass')];
+  const lp1 = n.x1.slice(0, 2), hp1 = n.x1.slice(2), lp2 = lr4('lowpass'), hp2 = lr4('highpass');
+  const ap2 = bq(c, 'allpass'); ap2.Q.value = Math.SQRT1_2; // keeps the low band phase-aligned with the mid/high split
+  n.x2 = [...lp2, ...hp2, ap2];
+  n.mbIn.connect(lp1[0]); n.mbIn.connect(hp1[0]); hp1[1].connect(lp2[0]); hp1[1].connect(hp2[0]); lp1[1].connect(ap2);
+  n.bands = [ap2, lp2[1], hp2[1]].map((src, i) => {
+    const b = { comp: c.createDynamicsCompressor(), mk: c.createGain(), solo: c.createGain() };
+    b.comp.knee.value = 6; b.comp.attack.value = MB_BANDS[i].atk; b.comp.release.value = MB_BANDS[i].rel;
+    chain(src, b.comp, b.mk, b.solo, n.mbWet);
+    return b;
+  });
+  n.mbIn.connect(n.mbDry); n.mbDry.connect(n.mbOut); n.mbWet.connect(n.mbOut);
+  n.comp = c.createDynamicsCompressor(); n.comp.knee.value = 6;
+  n.makeup = c.createGain();
+  n.split = c.createChannelSplitter(2); n.merge = c.createChannelMerger(2);
+  n.LL = c.createGain(); n.RL = c.createGain(); n.LR = c.createGain(); n.RR = c.createGain();
+  n.out = c.createGain();
+  chain(n.input, n.hp, n.low, n.mid, n.high, n.shaper, n.mbIn);
+  chain(n.mbOut, n.comp, n.makeup, n.split);
+  n.split.connect(n.LL, 0); n.LL.connect(n.merge, 0, 0);
+  n.split.connect(n.RL, 1); n.RL.connect(n.merge, 0, 0);
+  n.split.connect(n.LR, 0); n.LR.connect(n.merge, 0, 1);
+  n.split.connect(n.RR, 1); n.RR.connect(n.merge, 0, 1);
+  n.merge.connect(n.out);
+  n.last = n.out;
+  if (withLimiter) {
+    n.lim = c.createDynamicsCompressor();
+    n.lim.knee.value = 0; n.lim.ratio.value = 20; n.lim.attack.value = 0.001; n.lim.release.value = 0.08;
+    // the Web Audio compressor adds automatic makeup gain (~0.57 x |threshold| dB); undo it so peaks sit at the ceiling
+    n.limComp = c.createGain();
+    chain(n.out, n.lim, n.limComp); n.last = n.limComp;
+  }
+  return n;
+}
+function setMasterParams(c, n, m) {
+  setP(c, n.hp.frequency, m.hpf <= 20 ? 10 : m.hpf);
+  setP(c, n.low.frequency, m.lowF); setP(c, n.low.gain, m.low);
+  setP(c, n.mid.frequency, m.midF); setP(c, n.mid.gain, m.mid);
+  setP(c, n.high.frequency, m.highF); setP(c, n.high.gain, m.high);
+  n.shaper.curve = driveCurve(m.drive);
+  setP(c, n.comp.threshold, m.cThr); setP(c, n.comp.ratio, m.cRatio);
+  setP(c, n.comp.attack, m.cAtk / 1000); setP(c, n.comp.release, m.cRel / 1000);
+  setP(c, n.makeup.gain, dbToGain(m.makeup + compComp(m.cThr, m.cRatio)));
+  const listen = c instanceof OfflineAudioContext ? 'all' : S.mbListen;
+  const mbOn = !!m.mbOn || listen !== 'all';
+  setP(c, n.mbWet.gain, mbOn ? 1 : 0); setP(c, n.mbDry.gain, mbOn ? 0 : 1);
+  n.x1.forEach(f => setP(c, f.frequency, m.x1)); n.x2.forEach(f => setP(c, f.frequency, m.x2));
+  MB_BANDS.forEach(({ p }, i) => {
+    const b = n.bands[i], thr = m[p + 'Thr'], r = m[p + 'Rat'];
+    setP(c, b.comp.threshold, thr); setP(c, b.comp.ratio, r);
+    setP(c, b.mk.gain, dbToGain(m[p + 'Gain'] + compComp(thr, r)));
+    setP(c, b.solo.gain, listen === 'all' || listen === i ? 1 : 0);
+  });
+  const w = m.width / 100;
+  setP(c, n.LL.gain, (1 + w) / 2); setP(c, n.RR.gain, (1 + w) / 2);
+  setP(c, n.RL.gain, (1 - w) / 2); setP(c, n.LR.gain, (1 - w) / 2);
+  setP(c, n.out.gain, dbToGain(m.outGain));
+  if (n.lim) { setP(c, n.lim.threshold, m.ceiling); setP(c, n.limComp.gain, dbToGain(0.57 * m.ceiling)); }
+}
+
+function createTrackChain(c, t, dest) {
+  const n = {};
+  n.hp = bq(c, 'highpass'); n.hp.Q.value = Q_BUTTER;
+  n.notches = [];
+  if (t.hum) for (let h = 1; h <= 4; h++) { const f = bq(c, 'notch', t.hum * h); f.Q.value = 25; n.notches.push(f); }
+  n.low = bq(c, 'lowshelf', 120); n.mid = bq(c, 'peaking'); n.mid.Q.value = 1; n.high = bq(c, 'highshelf', 8000);
+  n.comp = c.createDynamicsCompressor(); n.comp.knee.value = 6; n.comp.attack.value = 0.008; n.comp.release.value = 0.15;
+  n.gain = c.createGain(); n.pan = c.createStereoPanner();
+  chain(n.hp, ...n.notches, n.low, n.mid, n.high, n.comp, n.gain, n.pan, dest);
+  n.input = n.hp;
+  setTrackParams(c, n, t);
+  return n;
+}
+function setTrackParams(c, n, t) {
+  setP(c, n.hp.frequency, t.hpf <= 20 ? 10 : t.hpf);
+  setP(c, n.low.gain, t.low); setP(c, n.mid.frequency, t.midF); setP(c, n.mid.gain, t.mid); setP(c, n.high.gain, t.high);
+  setP(c, n.comp.threshold, t.compThr); setP(c, n.comp.ratio, t.compRatio);
+  setP(c, n.gain.gain, trackLevel(t) * dbToGain(compComp(t.compThr, t.compRatio))); setP(c, n.pan.pan, t.pan);
+}
+
+function setupRealtime() {
+  const c = ctx;
+  RT = {};
+  RT.mix = c.createGain();
+  RT.master = createMasterChain(c, true);
+  RT.wet = c.createGain(); RT.dry = c.createGain(); RT.dry.gain.value = 0;
+  RT.final = c.createGain();
+  RT.mix.connect(RT.master.input); RT.master.last.connect(RT.wet); RT.wet.connect(RT.final);
+  RT.mix.connect(RT.dry); RT.dry.connect(RT.final);
+  RT.final.connect(c.destination);
+  setMasterParams(c, RT.master, S.m);
+  // meters
+  RT.spec = c.createAnalyser(); RT.spec.fftSize = 4096; RT.spec.smoothingTimeConstant = 0.82;
+  RT.final.connect(RT.spec);
+  const sp = c.createChannelSplitter(2); RT.final.connect(sp);
+  RT.pk = [c.createAnalyser(), c.createAnalyser()];
+  RT.pk.forEach((a, i) => { a.fftSize = 2048; sp.connect(a, i); });
+  // K-weighting approximation for loudness
+  const k1 = bq(c, 'highshelf', 1682); k1.gain.value = 4;
+  const k2 = bq(c, 'highpass', 38); k2.Q.value = 20 * Math.log10(0.5);
+  const sp2 = c.createChannelSplitter(2);
+  chain(RT.final, k1, k2, sp2);
+  RT.lu = [c.createAnalyser(), c.createAnalyser()];
+  RT.lu.forEach((a, i) => { a.fftSize = 16384; sp2.connect(a, i); });
+  RT.bufPk = new Float32Array(2048); RT.bufLu = new Float32Array(16384);
+  RT.freq = new Float32Array(RT.spec.frequencyBinCount);
+}
+
+// ---------- transport ----------
+function pos() { return S.playing ? S.offset + Math.max(0, ctx.currentTime - S.startAt) : S.offset; }
+function startSources() {
+  const when = ctx.currentTime + 0.05;
+  for (const t of S.tracks) {
+    t.nodes = createTrackChain(ctx, t, RT.mix);
+    const src = ctx.createBufferSource(); src.buffer = trackBuf(t); src.connect(t.nodes.input);
+    const local = S.offset - t.offset; // position inside this track's audio
+    if (local < src.buffer.duration) { if (local >= 0) src.start(when, local); else src.start(when - local, 0); }
+    t.nodes.src = src;
+  }
+  S.startAt = when;
+}
+function stopSources() {
+  for (const t of S.tracks) if (t.nodes) {
+    try { t.nodes.src.stop(); } catch (e) {}
+    t.nodes.src.disconnect(); t.nodes.pan.disconnect(); t.nodes = null;
+  }
+}
+async function play() {
+  if (!S.tracks.length) return;
+  await ac().resume();
+  if (S.offset >= projectDur()) S.offset = 0;
+  startSources(); S.playing = true; updatePlayBtn();
+}
+function pause() { if (!S.playing) return; S.offset = pos(); stopSources(); S.playing = false; updatePlayBtn(); }
+function stop() { if (S.playing) { stopSources(); S.playing = false; } S.offset = 0; updatePlayBtn(); }
+function seek(t) {
+  t = Math.max(0, Math.min(projectDur(), t));
+  if (S.playing) { stopSources(); S.offset = t; startSources(); } else S.offset = t;
+}
+function restartIfPlaying() { if (S.playing) { const p = pos(); stopSources(); S.offset = p; startSources(); } }
+function updatePlayBtn() { $('#playBtn').textContent = S.playing ? '❚❚ Pause' : '▶ Play'; }
+
+// ---------- tracks ----------
+const TRACK_SAVED = ['name', 'gain', 'pan', 'mute', 'solo', 'hpf', 'low', 'mid', 'midF', 'high', 'compThr', 'compRatio', 'hum', 'color', 'offset', 'nr', 'useProc'];
+function addTrack(name, buffer, bytes, saved) {
+  const t = { id: nextId++, name, orig: buffer, bytes, proc: null, useProc: true, gain: 0, pan: 0, mute: false, solo: false,
+    hpf: 20, low: 0, mid: 0, midF: 1000, high: 0, compThr: 0, compRatio: 3, hum: 0, offset: 0, color: COLORS[(nextId - 2) % COLORS.length],
+    nr: { reduction: 14, sensitivity: 6, smoothing: 2, profile: 'auto', firstSec: 1 } };
+  if (saved) for (const k of TRACK_SAVED) if (saved[k] !== undefined) t[k] = k === 'nr' ? { ...t.nr, ...saved.nr } : saved[k];
+  S.tracks.push(t);
+  renderTrack(t);
+  refreshLayout();
+  restartIfPlaying();
+  return t;
+}
+function removeTrack(t) {
+  const wasPlaying = S.playing; if (wasPlaying) pause();
+  S.tracks = S.tracks.filter(x => x !== t); t.el.root.remove();
+  if (S.offset > projectDur()) S.offset = 0;
+  refreshLayout();
+  if (wasPlaying && S.tracks.length) play();
+}
+function refreshLayout() {
+  const has = S.tracks.length > 0;
+  $('#empty').hidden = has; $('#rulerRow').hidden = !has;
+  requestAnimationFrame(redrawAll);
+}
+function updateLevels() { for (const t of S.tracks) if (t.nodes) setTrackParams(ctx, t.nodes, t); }
+
+function renderTrack(t) {
+  const root = document.createElement('div'); root.className = 'track'; root.style.setProperty('--c', t.color);
+  root.innerHTML = `
+    <div class="tctl">
+      <div class="trow">
+        <input class="tname" type="text" spellcheck="false">
+        <button class="btn sm m" title="Mute">M</button>
+        <button class="btn sm s" title="Solo">S</button>
+        <button class="btn sm fx" title="Track EQ, compressor, hum filter">FX</button>
+        <button class="btn sm nr" title="Noise reduction">NR</button>
+        <button class="btn sm del" title="Remove track">✕</button>
+      </div>
+      <div class="vol"></div><div class="pan"></div>
+      <div class="fx" hidden></div>
+    </div>
+    <div class="tlane" title="Click to seek · Shift+drag to move this track in time"><canvas></canvas><div class="playhead"></div><div class="badge" hidden>DENOISED</div></div>`;
+  const el = t.el = { root, canvas: $('canvas', root), lane: $('.tlane', root), head: $('.playhead', root), badge: $('.badge', root) };
+  const name = $('.tname', root); name.value = t.name; name.addEventListener('input', () => t.name = name.value);
+  const bM = $('.m', root), bS = $('.s', root), bFx = $('.fx', root), bNr = $('.nr', root), fx = $('div.fx', root);
+  bM.onclick = () => { t.mute = !t.mute; bM.classList.toggle('on', t.mute); updateLevels(); };
+  bS.onclick = () => { t.solo = !t.solo; bS.classList.toggle('on', t.solo); updateLevels(); };
+  bFx.onclick = () => { fx.hidden = !fx.hidden; bFx.classList.toggle('on', !fx.hidden); };
+  bNr.onclick = () => openNR(t);
+  $('.del', root).onclick = () => removeTrack(t);
+  el.nrBtn = bNr;
+  bM.classList.toggle('on', t.mute); bS.classList.toggle('on', t.solo);
+  const live = () => { if (t.nodes) setTrackParams(ctx, t.nodes, t); };
+  $('.vol', root).appendChild(el.vol = makeSlider({ label: 'Volume', min: -48, max: 12, step: 0.1, value: t.gain, def: 0, fmt: dbFmt, onInput: v => { t.gain = v; live(); } }));
+  $('.pan', root).appendChild(makeSlider({ label: 'Pan', min: -1, max: 1, step: 0.01, value: t.pan, def: 0,
+    fmt: v => v === 0 ? 'C' : (Math.abs(v) * 100).toFixed(0) + (v < 0 ? ' L' : ' R'), onInput: v => { t.pan = v; live(); } }));
+  for (const [k, label, min, max, step, fmt, def] of TRACK_CTLS)
+    fx.appendChild(makeSlider({ label, min, max, step, value: t[k], def, fmt, onInput: v => { t[k] = v; live(); } }));
+  const extra = document.createElement('div'); extra.className = 'full';
+  extra.innerHTML = `<span style="color:var(--muted);font-size:12px">Hum filter</span>
+    <select class="hum"><option value="0">Off</option><option value="50">50 Hz (EU/Asia)</option><option value="60">60 Hz (US)</option></select>
+    <label style="font-size:12px" hidden class="abl"><input type="checkbox" class="useproc" checked> Use denoised</label>
+    <span style="color:var(--muted);font-size:12px" title="Delay (+) or advance (−) this track. Tip: Shift+drag the waveform.">Offset</span>
+    <input type="number" class="offs" step="1"> <span style="color:var(--muted);font-size:12px">ms</span>`;
+  fx.appendChild(extra);
+  const hum = $('.hum', extra); hum.value = t.hum;
+  hum.onchange = e => { t.hum = +e.target.value; restartIfPlaying(); };
+  el.useProc = $('.useproc', extra); el.useProcLbl = $('.abl', extra);
+  el.useProc.onchange = () => { t.useProc = el.useProc.checked; updateNRUI(t); drawWave(t); restartIfPlaying(); };
+  el.offs = $('.offs', extra); el.offs.value = Math.round(t.offset * 1000);
+  el.offs.onchange = () => { t.offset = (+el.offs.value || 0) / 1000; redrawAll(); restartIfPlaying(); };
+  el.lane.addEventListener('pointerdown', e => {
+    const r = el.lane.getBoundingClientRect();
+    if (!e.shiftKey) return seek((e.clientX - r.left) / r.width * projectDur());
+    // Shift+drag: slide the track in time (scale is frozen during the drag)
+    e.preventDefault(); el.lane.setPointerCapture(e.pointerId);
+    const dur = projectDur(), x0 = e.clientX, o0 = t.offset;
+    const move = ev => { t.offset = Math.round((o0 + (ev.clientX - x0) / r.width * dur) * 1000) / 1000; el.offs.value = Math.round(t.offset * 1000); drawWave(t, dur); };
+    const up = () => { el.lane.removeEventListener('pointermove', move); el.lane.removeEventListener('pointerup', up); redrawAll(); restartIfPlaying(); };
+    el.lane.addEventListener('pointermove', move); el.lane.addEventListener('pointerup', up);
+  });
+  $('#tracks').appendChild(root);
+  updateNRUI(t);
+}
+function updateNRUI(t) {
+  const has = !!t.proc;
+  t.el.nrBtn.classList.toggle('on', has && t.useProc);
+  t.el.badge.hidden = !(has && t.useProc);
+  t.el.useProcLbl.hidden = !has;
+  t.el.useProc.checked = t.useProc;
+}
+
+// ---------- drawing ----------
+function drawPeaks(g, buf, w, h, dur, color, offset) {
+  const chs = []; for (let c = 0; c < buf.numberOfChannels; c++) chs.push(buf.getChannelData(c));
+  const n = buf.length, sr = buf.sampleRate, mid = h / 2;
+  g.fillStyle = color;
+  for (let x = 0; x < w; x++) {
+    let s0 = Math.floor((x * dur / w - offset) * sr), s1 = Math.floor(((x + 1) * dur / w - offset) * sr);
+    if (s1 <= 0 || s0 >= n) continue;
+    s0 = Math.max(0, s0); s1 = Math.min(n, Math.max(s1, s0 + 1));
+    const stride = Math.max(1, Math.floor((s1 - s0) / 300));
+    let mn = 0, mx = 0;
+    for (const d of chs) for (let i = s0; i < s1; i += stride) { const v = d[i]; if (v < mn) mn = v; if (v > mx) mx = v; }
+    const y0 = mid - mx * mid * 0.92, y1 = mid - mn * mid * 0.92;
+    g.fillRect(x, y0, 1, Math.max(1, y1 - y0));
+  }
+}
+function drawWave(t, dur = projectDur()) {
+  const cv = t.el.canvas, w = cv.clientWidth, h = cv.clientHeight, dpr = window.devicePixelRatio || 1;
+  if (!w || !h) return;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+  g.fillStyle = 'rgba(255,255,255,.05)'; g.fillRect(0, h / 2, w, 1);
+  if (!dur) return;
+  const x0 = Math.max(0, t.offset / dur * w), x1 = Math.min(w, (t.offset + t.orig.duration) / dur * w);
+  g.fillStyle = 'rgba(255,255,255,.025)'; g.fillRect(x0, 0, x1 - x0, h);
+  if (t.proc && t.useProc) { drawPeaks(g, t.orig, w, h, dur, 'rgba(255,255,255,.13)', t.offset); drawPeaks(g, t.proc, w, h, dur, t.color, t.offset); }
+  else drawPeaks(g, t.orig, w, h, dur, t.color, t.offset);
+  if (t.mute || (anySolo() && !t.solo)) { g.fillStyle = 'rgba(18,6,38,.6)'; g.fillRect(0, 0, w, h); }
+}
+function drawRuler() {
+  const cv = $('#ruler'), w = cv.clientWidth, h = cv.clientHeight, dpr = window.devicePixelRatio || 1;
+  if (!w) return;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+  const dur = projectDur(); if (!dur) return;
+  const steps = [0.5, 1, 2, 5, 10, 15, 30, 60, 120, 300];
+  const step = steps.find(s => w / (dur / s) >= 60) || 600;
+  g.fillStyle = '#9585B5'; g.strokeStyle = '#3D2470'; g.font = '10px Nunito, Segoe UI, sans-serif';
+  for (let s = 0; s <= dur; s += step) {
+    const x = Math.round(s / dur * w) + 0.5;
+    g.beginPath(); g.moveTo(x, h - 8); g.lineTo(x, h); g.stroke();
+    g.fillText(fmtTime(s).replace(/\.0$/, ''), x + 3, 13);
+  }
+}
+function redrawAll() { drawRuler(); S.tracks.forEach(drawWave); }
+new ResizeObserver(() => requestAnimationFrame(redrawAll)).observe($('#tracksPane'));
+$('#ruler').addEventListener('pointerdown', e => { const r = e.target.getBoundingClientRect(); seek((e.clientX - r.left) / r.width * projectDur()); });
+
+const peakHold = [-Infinity, -Infinity]; let peakMaxShown = -Infinity, peakMaxTime = 0;
+function tick() {
+  requestAnimationFrame(tick);
+  const dur = projectDur(); let p = pos();
+  if (S.playing && p >= dur) { pause(); S.offset = 0; p = 0; }
+  for (const t of S.tracks) { const w = t.el.lane.clientWidth; t.el.head.style.transform = `translateX(${dur ? p / dur * w : 0}px)`; }
+  $('#time').textContent = fmtTime(p) + ' / ' + fmtTime(dur);
+  drawMeters(); drawGR();
+}
+function drawMeters() {
+  if (!RT) return;
+  // peak
+  const pk = [0, 0];
+  RT.pk.forEach((a, i) => { a.getFloatTimeDomainData(RT.bufPk); let m = 0; for (const v of RT.bufPk) { const x = Math.abs(v); if (x > m) m = x; } pk[i] = gainToDb(m); });
+  let ms = 0;
+  RT.lu.forEach(a => { a.getFloatTimeDomainData(RT.bufLu); let s = 0; for (const v of RT.bufLu) s += v * v; ms += s / RT.bufLu.length; });
+  const lufs = ms > 1e-10 ? -0.691 + 10 * Math.log10(ms) : -Infinity;
+  $('#lufsM').textContent = isFinite(lufs) && lufs > -70 ? lufs.toFixed(1) : '–∞';
+  const now = performance.now(), maxPk = Math.max(pk[0], pk[1]);
+  if (maxPk > peakMaxShown || now - peakMaxTime > 1500) { peakMaxShown = maxPk; peakMaxTime = now; }
+  $('#peakR').textContent = peakMaxShown > -90 ? peakMaxShown.toFixed(1) : '–∞';
+  $('#peakR').style.color = peakMaxShown > -0.1 ? 'var(--danger)' : '';
+
+  const cv = $('#meter'), w = cv.clientWidth, h = cv.clientHeight, dpr = window.devicePixelRatio || 1;
+  if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+  const X = db => Math.max(0, Math.min(1, (db + 60) / 60)) * (w - 4) + 2;
+  const grad = g.createLinearGradient(0, 0, w, 0);
+  grad.addColorStop(0, '#6E9A0A'); grad.addColorStop(0.75, '#B0ED0F'); grad.addColorStop(0.9, '#FFB547'); grad.addColorStop(1, '#FF5C5C');
+  for (let i = 0; i < 2; i++) {
+    peakHold[i] = Math.max(pk[i], (peakHold[i] || -60) - 0.4);
+    const y = 4 + i * 12;
+    g.fillStyle = '#241045'; g.fillRect(2, y, w - 4, 9);
+    g.fillStyle = grad; g.fillRect(2, y, X(pk[i]) - 2, 9);
+    g.fillStyle = '#fff'; g.fillRect(X(peakHold[i]) - 1, y, 2, 9);
+  }
+  g.fillStyle = '#9585B5'; g.font = '9px Nunito, Segoe UI, sans-serif';
+  for (const db of [-48, -36, -24, -12, -6, 0]) { const x = X(db); g.fillText(db, Math.min(x - 4, w - 12), h - 2); }
+
+  // spectrum
+  const sc = $('#spectrum'), sw = sc.clientWidth, sh = sc.clientHeight;
+  if (sc.width !== Math.round(sw * dpr)) { sc.width = Math.round(sw * dpr); sc.height = Math.round(sh * dpr); }
+  const s = sc.getContext('2d'); s.setTransform(dpr, 0, 0, dpr, 0, 0); s.clearRect(0, 0, sw, sh);
+  s.strokeStyle = 'rgba(255,255,255,.05)'; s.fillStyle = '#9585B5'; s.font = '9px Nunito, Segoe UI, sans-serif';
+  for (const f of [50, 100, 200, 500, 1000, 2000, 5000, 10000]) {
+    const x = Math.log(f / 20) / Math.log(1000) * sw; s.beginPath(); s.moveTo(x, 0); s.lineTo(x, sh); s.stroke();
+    s.fillText(f >= 1000 ? f / 1000 + 'k' : f, x + 2, sh - 3);
+  }
+  if (S.m.mbOn) {
+    s.save(); s.setLineDash([3, 3]); s.strokeStyle = 'rgba(201,162,255,.6)';
+    for (const f of [S.m.x1, S.m.x2]) { const x = Math.log(f / 20) / Math.log(1000) * sw; s.beginPath(); s.moveTo(x, 0); s.lineTo(x, sh); s.stroke(); }
+    s.restore();
+  }
+  RT.spec.getFloatFrequencyData(RT.freq);
+  const nyq = ctx.sampleRate / 2, bins = RT.freq.length;
+  s.beginPath(); s.moveTo(0, sh);
+  for (let x = 0; x <= sw; x += 2) {
+    const f = 20 * Math.pow(1000, x / sw), b = Math.min(bins - 1, Math.round(f / nyq * bins));
+    const db = RT.freq[b] + 4.5 * Math.log2(f / 1000); // +4.5 dB/oct tilt so music reads flat
+    const y = sh - Math.max(0, Math.min(1, (db + 100) / 90)) * sh;
+    s.lineTo(x, y);
+  }
+  s.lineTo(sw, sh); s.closePath();
+  const sg = s.createLinearGradient(0, 0, 0, sh); sg.addColorStop(0, 'rgba(176,237,15,.5)'); sg.addColorStop(1, 'rgba(176,237,15,.04)');
+  s.fillStyle = sg; s.fill(); s.strokeStyle = '#B0ED0F'; s.lineWidth = 1.2; s.stroke();
+}
+
+// ---------- master UI ----------
+const masterInputs = {};
+function buildMasterUI() {
+  const sel = $('#preset');
+  sel.innerHTML = Object.keys(PRESETS).map(k => `<option>${k}</option>`).join('');
+  sel.onchange = () => applyMaster({ ...MASTER_DEFAULT, ...PRESETS[sel.value] });
+  const host = $('#mctls');
+  const slider = (k, label, min, max, step, fmt, after) => masterInputs[k] = makeSlider({ label, min, max, step, value: S.m[k], def: MASTER_DEFAULT[k], fmt,
+    onInput: v => { S.m[k] = v; if (RT) setMasterParams(ctx, RT.master, S.m); if (k === 'target') $('#exTarget').textContent = v.toFixed(1); after && after(); } });
+  for (const [title, ctls] of MASTER_CTLS) {
+    const card = document.createElement('div'); card.className = 'card';
+    card.innerHTML = `<h3>${title}</h3>`;
+    if (ctls === 'MB') buildMultiband(card, slider);
+    else for (const [k, label, min, max, step, fmt] of ctls) card.appendChild(slider(k, label, min, max, step, fmt));
+    if (title === 'Glue compressor') $('h3', card).insertAdjacentHTML('beforeend', '<span class="grt" id="glueGR"></span>');
+    host.appendChild(card);
+  }
+  $('#exTarget').textContent = S.m.target.toFixed(1);
+}
+const mbUI = { gr: [], grt: [], rng: [] };
+function buildMultiband(card, slider) {
+  $('h3', card).insertAdjacentHTML('beforeend', `<span class="right">
+    <select id="mbListen" title="Listen to one band on its own (playback only)"><option value="all">Listen: all</option><option value="0">Low only</option><option value="1">Mid only</option><option value="2">High only</option></select>
+    <button class="btn sm" id="mbOnBtn">Off</button></span>`);
+  const btn = $('#mbOnBtn', card);
+  const refresh = () => {
+    btn.textContent = S.m.mbOn ? 'On' : 'Off'; btn.classList.toggle('on', !!S.m.mbOn); btn.classList.toggle('fx', true);
+    card.classList.toggle('mboff', !S.m.mbOn);
+    const f = v => v >= 1000 ? (v / 1000).toFixed(1) + 'k' : Math.round(v);
+    mbUI.rng[0].textContent = `20 – ${f(S.m.x1)} Hz`; mbUI.rng[1].textContent = `${f(S.m.x1)} – ${f(S.m.x2)} Hz`; mbUI.rng[2].textContent = `${f(S.m.x2)} Hz – 20k`;
+  };
+  masterInputs.mbOn = { set: refresh };
+  btn.onclick = () => { S.m.mbOn = S.m.mbOn ? 0 : 1; refresh(); if (RT) setMasterParams(ctx, RT.master, S.m); };
+  $('#mbListen', card).onchange = e => { S.mbListen = e.target.value === 'all' ? 'all' : +e.target.value; if (RT) setMasterParams(ctx, RT.master, S.m); };
+  card.appendChild(slider('x1', 'Low / Mid', 40, 1000, 5, hz, () => refresh()));
+  card.appendChild(slider('x2', 'Mid / High', 1000, 12000, 50, hz, () => refresh()));
+  MB_BANDS.forEach(({ p, name }, i) => {
+    const sec = document.createElement('div'); sec.className = 'mbband';
+    sec.innerHTML = `<div class="mbhead"><b>${name}</b><span class="rng"></span><span class="gr" title="Gain reduction"><i></i></span><span class="grt">0.0 dB</span></div>`;
+    mbUI.rng[i] = $('.rng', sec); mbUI.gr[i] = $('.gr i', sec); mbUI.grt[i] = $('.grt', sec);
+    sec.appendChild(slider(p + 'Thr', 'Threshold', -48, 0, 0.5, dbFmt));
+    sec.appendChild(slider(p + 'Rat', 'Ratio', 1, 10, 0.1, v => v <= 1 ? 'off' : ratio(v)));
+    sec.appendChild(slider(p + 'Gain', 'Band gain', -12, 12, 0.1, dbFmt));
+    card.appendChild(sec);
+  });
+  refresh();
+}
+function drawGR() {
+  if (!RT) return;
+  const red = cmp => { const r = cmp.reduction; return Math.abs(typeof r === 'number' ? r : (r && r.value) || 0); };
+  const live = S.playing && !S.bypass;
+  RT.master.bands.forEach((b, i) => {
+    const r = live && (S.m.mbOn || S.mbListen !== 'all') ? red(b.comp) : 0;
+    mbUI.gr[i].style.width = Math.min(100, r / 12 * 100) + '%';
+    mbUI.grt[i].textContent = (r > 0.05 ? '−' : '') + r.toFixed(1) + ' dB';
+  });
+  const g = live ? red(RT.master.comp) : 0;
+  $('#glueGR').textContent = g > 0.05 ? `GR −${g.toFixed(1)} dB` : '';
+}
+function applyMaster(m) {
+  S.m = { ...m };
+  for (const k in masterInputs) masterInputs[k].set(S.m[k]);
+  $('#exTarget').textContent = S.m.target.toFixed(1);
+  if (RT) setMasterParams(ctx, RT.master, S.m);
+}
+
+// ---------- offline DSP: loudness (ITU-R BS.1770) ----------
+function biquadCoefs(type, fc, G, Q, fs) {
+  const A = Math.pow(10, G / 40), w0 = 2 * Math.PI * fc / fs, cs = Math.cos(w0), al = Math.sin(w0) / (2 * Q);
+  let b0, b1, b2, a0, a1, a2;
+  if (type === 'shelf') {
+    const sA = 2 * Math.sqrt(A) * al;
+    b0 = A * ((A + 1) + (A - 1) * cs + sA); b1 = -2 * A * ((A - 1) + (A + 1) * cs); b2 = A * ((A + 1) + (A - 1) * cs - sA);
+    a0 = (A + 1) - (A - 1) * cs + sA; a1 = 2 * ((A - 1) - (A + 1) * cs); a2 = (A + 1) - (A - 1) * cs - sA;
+  } else {
+    b0 = (1 + cs) / 2; b1 = -(1 + cs); b2 = (1 + cs) / 2; a0 = 1 + al; a1 = -2 * cs; a2 = 1 - al;
+  }
+  return [b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0];
+}
+function measureLUFS(chs, sr) {
+  const k1 = biquadCoefs('shelf', 1681.974450955532, 3.99984385397, 0.7071752369554193, sr);
+  const k2 = biquadCoefs('hp', 38.13547087613982, 0, 0.5003270373253953, sr);
+  const S100 = Math.round(sr * 0.1), n = chs[0].length, nSeg = Math.floor(n / S100);
+  const seg = new Float64Array(nSeg);
+  for (const x of chs) {
+    let x1 = 0, x2 = 0, y1 = 0, y2 = 0, u1 = 0, u2 = 0, z1 = 0, z2 = 0;
+    for (let s = 0; s < nSeg; s++) {
+      let acc = 0;
+      for (let i = s * S100, e = i + S100; i < e; i++) {
+        const xi = x[i];
+        const y = k1[0] * xi + k1[1] * x1 + k1[2] * x2 - k1[3] * y1 - k1[4] * y2; x2 = x1; x1 = xi; y2 = y1; y1 = y;
+        const z = k2[0] * y + k2[1] * u1 + k2[2] * u2 - k2[3] * z1 - k2[4] * z2; u2 = u1; u1 = y; z2 = z1; z1 = z;
+        acc += z * z;
+      }
+      seg[s] += acc;
+    }
+  }
+  const blocks = [];
+  for (let s = 0; s + 4 <= nSeg; s++) blocks.push((seg[s] + seg[s + 1] + seg[s + 2] + seg[s + 3]) / (4 * S100));
+  const L = z => -0.691 + 10 * Math.log10(z);
+  const abs = blocks.filter(z => z > 0 && L(z) > -70);
+  if (!abs.length) return -Infinity;
+  const mean = a => a.reduce((p, c) => p + c, 0) / a.length;
+  const rel = L(mean(abs)) - 10;
+  const gated = abs.filter(z => L(z) > rel);
+  return L(mean(gated.length ? gated : abs));
+}
+function peakDb(chs) { let m = 0; for (const x of chs) for (let i = 0; i < x.length; i++) { const a = Math.abs(x[i]); if (a > m) m = a; } return gainToDb(m); }
+
+// ---------- offline DSP: look-ahead brickwall limiter ----------
+function slidingMinFwd(a, w) { // out[i] = min(a[i .. i+w-1])
+  const n = a.length, out = new Float32Array(n), dq = new Int32Array(n); let h = 0, t = 0;
+  for (let i = n - 1; i >= 0; i--) {
+    while (t > h && a[dq[t - 1]] >= a[i]) t--;
+    dq[t++] = i;
+    while (dq[h] > i + w - 1) h++;
+    out[i] = a[dq[h]];
+  }
+  return out;
+}
+function limit(L, R, sr, preGain, ceil) {
+  const n = L.length, la = Math.max(1, Math.round(sr * 0.005));
+  const g = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const a = Math.max(Math.abs(L[i]), Math.abs(R[i])) * preGain; g[i] = a > ceil ? ceil / a : 1; }
+  const env = slidingMinFwd(g, la + 1);
+  const rel = Math.exp(-1 / (sr * 0.06));
+  let e = 1;
+  for (let i = 0; i < n; i++) { const tg = env[i]; e = tg < e ? tg : tg + (e - tg) * rel; env[i] = e; }
+  const oL = new Float32Array(n), oR = new Float32Array(n);
+  let sum = env[0] * la; const hist = env; // moving average of last `la` gains (pad with env[0])
+  for (let i = 0; i < n; i++) {
+    sum += env[i] - (i - la >= 0 ? hist[i - la] : env[0]);
+    const gg = sum / la * preGain;
+    let l = L[i] * gg, r = R[i] * gg;
+    if (l > ceil) l = ceil; else if (l < -ceil) l = -ceil;
+    if (r > ceil) r = ceil; else if (r < -ceil) r = -ceil;
+    oL[i] = l; oR[i] = r;
+  }
+  return [oL, oR];
+}
+
+// ---------- offline render ----------
+async function renderPre() {
+  const sr = ac().sampleRate, len = Math.ceil((projectDur() + 0.25) * sr);
+  const oc = new OfflineAudioContext(2, len, sr);
+  const mc = createMasterChain(oc, false); setMasterParams(oc, mc, S.m); mc.last.connect(oc.destination);
+  for (const t of S.tracks) {
+    const n = createTrackChain(oc, t, mc.input);
+    const src = oc.createBufferSource(); src.buffer = trackBuf(t); src.connect(n.input);
+    src.start(Math.max(0, t.offset), Math.max(0, -t.offset));
+  }
+  return oc.startRendering();
+}
+async function masterRender(normalize) {
+  busy('Rendering mix…', 0.15); await sleep(30);
+  const pre = await renderPre();
+  busy('Limiting & measuring loudness…', 0.55); await sleep(30);
+  const L = pre.getChannelData(0), R = pre.getChannelData(1), sr = pre.sampleRate, ceil = dbToGain(S.m.ceiling);
+  let extra = 0, out, lufs;
+  if (normalize) {
+    const l0 = measureLUFS([L, R], sr);
+    if (isFinite(l0)) extra = Math.min(30, S.m.target - l0);
+    for (let i = 0; i < 5; i++) {
+      out = limit(L, R, sr, dbToGain(extra), ceil); lufs = measureLUFS(out, sr);
+      const d = S.m.target - lufs;
+      if (!isFinite(d) || Math.abs(d) < 0.05 || i === 4 || extra >= 30) break;
+      extra = Math.min(30, extra + d);
+      busy('Matching target loudness…', 0.55 + i * 0.08); await sleep(10);
+    }
+  } else { out = limit(L, R, sr, 1, ceil); lufs = measureLUFS(out, sr); }
+  const preLufs = measureLUFS([L, R], sr), prePk = peakDb([L, R]);
+  return { out, sr, lufs, peak: peakDb(out), extra, preLufs, prePk };
+}
+function describe(r) {
+  const gr = Math.max(0, r.prePk + r.extra - S.m.ceiling);
+  return `Integrated <b>${isFinite(r.lufs) ? r.lufs.toFixed(1) : '–∞'} LUFS</b> · Peak <b>${r.peak.toFixed(1)} dBFS</b> · Limiter up to <b>${gr.toFixed(1)} dB</b> GR`;
+}
+
+$('#analyzeBtn').onclick = async () => {
+  if (!S.tracks.length) return toast('Add some tracks first');
+  try {
+    const r = await masterRender(false);
+    const need = S.m.target - r.lufs;
+    $('#analysis').innerHTML = describe(r) + `<br>Target ${S.m.target} LUFS → ${Math.abs(need) < 0.3 ? 'on target ✓' : (need > 0 ? 'needs about +' : 'needs about ') + need.toFixed(1) + ' dB'}`;
+  } catch (e) { console.error(e); toast('Analysis failed: ' + e.message); }
+  busy(false);
+};
+$('#matchBtn').onclick = async () => {
+  if (!S.tracks.length) return toast('Add some tracks first');
+  try {
+    const r = await masterRender(true);
+    const g = Math.max(-24, Math.min(24, S.m.outGain + r.extra));
+    S.m.outGain = +g.toFixed(1); masterInputs.outGain.set(S.m.outGain); if (RT) setMasterParams(ctx, RT.master, S.m);
+    $('#analysis').innerHTML = describe(r) + `<br>Output gain set to ${dbFmt(S.m.outGain)}`;
+  } catch (e) { console.error(e); toast('Analysis failed: ' + e.message); }
+  busy(false);
+};
+
+// ---------- export ----------
+function encodeWav(chs, sr, bits, dither) {
+  const nCh = chs.length, n = chs[0].length, bps = bits / 8, dataLen = n * nCh * bps;
+  const buf = new ArrayBuffer(44 + dataLen), v = new DataView(buf);
+  const ws = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  ws(0, 'RIFF'); v.setUint32(4, 36 + dataLen, true); ws(8, 'WAVE'); ws(12, 'fmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, bits === 32 ? 3 : 1, true); v.setUint16(22, nCh, true);
+  v.setUint32(24, sr, true); v.setUint32(28, sr * nCh * bps, true); v.setUint16(32, nCh * bps, true); v.setUint16(34, bits, true);
+  ws(36, 'data'); v.setUint32(40, dataLen, true);
+  let o = 44;
+  for (let i = 0; i < n; i++) for (let c = 0; c < nCh; c++) {
+    const s = chs[c][i];
+    if (bits === 32) { v.setFloat32(o, s, true); o += 4; }
+    else if (bits === 16) {
+      let q = Math.round(s * 32767 + (dither ? Math.random() - Math.random() : 0));
+      v.setInt16(o, q < -32768 ? -32768 : q > 32767 ? 32767 : q, true); o += 2;
+    } else {
+      let q = Math.round(s * 8388607); q = q < -8388608 ? -8388608 : q > 8388607 ? 8388607 : q;
+      v.setUint8(o, q & 255); v.setUint8(o + 1, (q >> 8) & 255); v.setUint8(o + 2, (q >> 16) & 255); o += 3;
+    }
+  }
+  return new Blob([buf], { type: 'audio/wav' });
+}
+$('#exportBtn').onclick = () => { if (!S.tracks.length) return toast('Add some tracks first'); $('#exInfo').textContent = ''; $('#exDlg').showModal(); };
+$('#exCancel').onclick = () => $('#exDlg').close();
+$('#exGo').onclick = async () => {
+  const bits = +$('#exBits').value, norm = $('#exNorm').checked, dith = $('#exDither').checked;
+  try {
+    const r = await masterRender(norm);
+    busy('Encoding WAV…', 0.95); await sleep(30);
+    const blob = encodeWav(r.out, r.sr, bits, bits === 16 && dith);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = ($('#exName').value.trim() || 'master').replace(/[\\/:*?"<>|]/g, '_') + '.wav';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+    $('#exInfo').innerHTML = 'Exported ✓ ' + describe(r) + ` · ${r.sr / 1000} kHz / ${bits}-bit`;
+    $('#analysis').innerHTML = describe(r);
+  } catch (e) { console.error(e); toast('Export failed: ' + e.message); }
+  busy(false);
+};
+
+// ---------- noise reduction (spectral gating, runs in a worker) ----------
+function nrProcess(channels, opts, progress) {
+  const N = 2048, H = 512, half = N / 2, bits = 11;
+  const rev = new Uint32Array(N);
+  for (let i = 0; i < N; i++) { let r = 0, x = i; for (let b = 0; b < bits; b++) { r = (r << 1) | (x & 1); x >>= 1; } rev[i] = r; }
+  const cosT = new Float64Array(half), sinT = new Float64Array(half);
+  for (let i = 0; i < half; i++) { cosT[i] = Math.cos(2 * Math.PI * i / N); sinT[i] = -Math.sin(2 * Math.PI * i / N); }
+  function fft(re, im, inv) {
+    for (let i = 0; i < N; i++) { const j = rev[i]; if (i < j) { let t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t; } }
+    for (let size = 2; size <= N; size <<= 1) {
+      const hs = size >> 1, step = N / size;
+      for (let i = 0; i < N; i += size) for (let j = 0; j < hs; j++) {
+        const k = j * step, wr = cosT[k], wi = inv ? -sinT[k] : sinT[k], a = i + j, b = a + hs;
+        const tr = re[b] * wr - im[b] * wi, ti = re[b] * wi + im[b] * wr;
+        re[b] = re[a] - tr; im[b] = im[a] - ti; re[a] += tr; im[a] += ti;
+      }
+    }
+    if (inv) for (let i = 0; i < N; i++) { re[i] /= N; im[i] /= N; }
+  }
+  const win = new Float64Array(N); for (let i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / N);
+  const floor = Math.pow(10, -opts.reduction / 20), over = Math.pow(10, opts.sensitivity / 20), sm = opts.smoothing | 0;
+  const re = new Float64Array(N), im = new Float64Array(N);
+  const out = []; let noiseDb = 0, done = 0;
+  const totalFrames = channels.reduce((s, x) => s + Math.floor((x.length + N) / H) + 1, 0);
+  for (const x of channels) {
+    const len = x.length, P = new Float32Array(len + 2 * N); P.set(x, N);
+    const nF = Math.floor((P.length - N) / H) + 1;
+    // frame energies for profile selection
+    const en = new Float64Array(nF);
+    for (let f = 0; f < nF; f++) { const o = f * H; let s = 0; for (let i = 0; i < N; i++) s += P[o + i] * P[o + i]; en[f] = s / N; }
+    let sel = [];
+    if (opts.profile === 'first') {
+      const lim = opts.firstSec * opts.sr;
+      for (let f = 0; f < nF; f++) { const st = f * H - N; if (st >= 0 && st + N <= lim && st + N <= len) sel.push(f); }
+    }
+    if (!sel.length) {
+      const valid = [];
+      for (let f = 0; f < nF; f++) { const st = f * H - N; if (st >= 0 && st + N <= len && en[f] > 1e-12) valid.push(f); }
+      valid.sort((a, b) => en[a] - en[b]);
+      sel = valid.slice(0, Math.max(8, Math.floor(valid.length * 0.08)));
+    }
+    const noise = new Float64Array(half + 1);
+    if (sel.length) {
+      let e = 0;
+      for (const f of sel) {
+        const o = f * H; e += en[f];
+        for (let i = 0; i < N; i++) { re[i] = P[o + i] * win[i]; im[i] = 0; }
+        fft(re, im, false);
+        for (let k = 0; k <= half; k++) noise[k] += re[k] * re[k] + im[k] * im[k];
+      }
+      for (let k = 0; k <= half; k++) noise[k] = Math.sqrt(noise[k] / sel.length);
+      noiseDb += 10 * Math.log10(e / sel.length + 1e-20) / channels.length;
+    }
+    const y = new Float32Array(P.length), g = new Float64Array(half + 1), gs = new Float64Array(half + 1), prev = new Float64Array(half + 1).fill(1);
+    for (let f = 0; f < nF; f++) {
+      const o = f * H;
+      for (let i = 0; i < N; i++) { re[i] = P[o + i] * win[i]; im[i] = 0; }
+      fft(re, im, false);
+      for (let k = 0; k <= half; k++) {
+        const m2 = re[k] * re[k] + im[k] * im[k], th = noise[k] * over;
+        let v = m2 > 1e-24 ? 1 - (th * th) / m2 : 0;
+        g[k] = v > 0 ? Math.sqrt(v) : 0;
+      }
+      for (let k = 0; k <= half; k++) {
+        let s = 0, c = 0;
+        for (let j = k - sm; j <= k + sm; j++) if (j >= 0 && j <= half) { s += g[j]; c++; }
+        const tg = s / c;
+        prev[k] += (tg - prev[k]) * (tg > prev[k] ? 0.7 : 0.25);
+        gs[k] = Math.max(floor, prev[k]);
+      }
+      for (let k = 0; k <= half; k++) {
+        re[k] *= gs[k]; im[k] *= gs[k];
+        if (k > 0 && k < half) { re[N - k] *= gs[k]; im[N - k] *= gs[k]; }
+      }
+      fft(re, im, true);
+      for (let i = 0; i < N; i++) y[o + i] += re[i] * win[i] / 1.5;
+      if (++done % 400 === 0) progress(done / totalFrames);
+    }
+    out.push(y.slice(N, N + len));
+  }
+  return { out, noiseDb };
+}
+function runNR(channels, opts, onProgress) {
+  return new Promise((resolve, reject) => {
+    let w;
+    try {
+      const src = `const nrProcess = ${nrProcess.toString()};
+        onmessage = e => { const r = nrProcess(e.data.channels, e.data.opts, p => postMessage({ progress: p }));
+          postMessage({ result: r }, r.out.map(a => a.buffer)); };`;
+      w = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+    } catch (e) { w = null; }
+    if (!w) { // fallback: main thread
+      setTimeout(() => { try { resolve(nrProcess(channels, opts, onProgress)); } catch (e) { reject(e); } }, 30);
+      return;
+    }
+    w.onmessage = e => { if (e.data.progress != null) onProgress(e.data.progress); else { w.terminate(); resolve(e.data.result); } };
+    w.onerror = e => { w.terminate(); reject(new Error(e.message || 'worker error')); };
+    w.postMessage({ channels, opts }, channels.map(a => a.buffer));
+  });
+}
+
+async function applyNR(t, onProgress) {
+  const buf = t.orig, chs = [];
+  for (let c = 0; c < buf.numberOfChannels; c++) chs.push(buf.getChannelData(c).slice());
+  const r = await runNR(chs, { ...t.nr, sr: buf.sampleRate }, onProgress);
+  const nb = ac().createBuffer(buf.numberOfChannels, buf.length, buf.sampleRate);
+  r.out.forEach((d, c) => nb.copyToChannel(d, c));
+  t.proc = nb; t.nrNoiseDb = r.noiseDb;
+  updateNRUI(t); drawWave(t); restartIfPlaying();
+  return r.noiseDb;
+}
+
+let nrTrack = null; const nrCtls = {};
+(function buildNRUI() {
+  const host = $('#nrCtls');
+  const defs = [
+    ['reduction', 'Reduction', 0, 40, 1, v => v + ' dB', 14],
+    ['sensitivity', 'Sensitivity', 0, 15, 0.5, v => '+' + v + ' dB', 6],
+    ['smoothing', 'Smoothing', 0, 6, 1, v => v ? v + ' bins' : 'off', 2],
+  ];
+  for (const [k, label, min, max, step, fmt, def] of defs)
+    host.appendChild(nrCtls[k] = makeSlider({ label, min, max, step, value: def, def, fmt, onInput: v => nrTrack && (nrTrack.nr[k] = v) }));
+  nrCtls.firstSec = makeSlider({ label: 'Noise-only', min: 0.3, max: 5, step: 0.1, value: 1, def: 1, fmt: v => v.toFixed(1) + ' s', onInput: v => nrTrack && (nrTrack.nr.firstSec = v) });
+  $('#nrFirstWrap').appendChild(nrCtls.firstSec);
+  $('#nrProfile').onchange = e => { if (nrTrack) nrTrack.nr.profile = e.target.value; nrCtls.firstSec.hidden = e.target.value !== 'first'; };
+})();
+function openNR(t) {
+  nrTrack = t;
+  $('#nrName').textContent = t.name;
+  for (const k of ['reduction', 'sensitivity', 'smoothing', 'firstSec']) nrCtls[k].set(t.nr[k]);
+  $('#nrProfile').value = t.nr.profile; nrCtls.firstSec.hidden = t.nr.profile !== 'first';
+  $('#nrInfo').textContent = t.proc ? `Applied. Noise floor was about ${t.nrNoiseDb.toFixed(1)} dBFS. Use FX → "Use denoised" to A/B.` :
+    'Tip: Reduction sets how far the noise drops. Raise Sensitivity if noise remains, lower it if the music sounds watery.';
+  $('#nrRemove').disabled = !t.proc;
+  $('#nrProg').hidden = true;
+  $('#nrDlg').showModal();
+}
+$('#nrCancel').onclick = () => $('#nrDlg').close();
+$('#nrRemove').onclick = () => {
+  const t = nrTrack; if (!t) return;
+  t.proc = null; updateNRUI(t); drawWave(t); restartIfPlaying(); $('#nrDlg').close(); toast('Noise reduction removed');
+};
+$('#nrApply').onclick = async () => {
+  const t = nrTrack; if (!t) return;
+  const btn = $('#nrApply'); btn.disabled = true;
+  const prog = $('#nrProg'), bar = $('i', prog); prog.hidden = false; bar.style.width = '0%';
+  $('#nrInfo').textContent = 'Learning the noise profile and cleaning…';
+  try {
+    t.useProc = true;
+    const noiseDb = await applyNR(t, p => bar.style.width = (p * 100).toFixed(0) + '%');
+    bar.style.width = '100%';
+    $('#nrInfo').textContent = `Done. Noise floor was about ${noiseDb.toFixed(1)} dBFS. Press Play to listen.`;
+    $('#nrRemove').disabled = false;
+  } catch (e) { console.error(e); $('#nrInfo').textContent = 'Failed: ' + e.message; }
+  btn.disabled = false;
+};
+
+// ---------- file loading ----------
+async function loadFiles(files) {
+  const proj = [...files].find(f => /\.msproj$/i.test(f.name));
+  if (proj) return openProject(proj);
+  files = [...files].filter(f => f.type.startsWith('audio') || /\.(wav|mp3|flac|ogg|oga|m4a|aac|aiff?|opus|webm)$/i.test(f.name));
+  if (!files.length) return toast('No audio files found');
+  const c = ac(); let i = 0;
+  for (const f of files) {
+    busy(`Decoding ${f.name}…`, i++ / files.length);
+    try {
+      const ab = await f.arrayBuffer(), bytes = new Blob([ab]); // keep the original file for project saving
+      const buf = await c.decodeAudioData(ab); addTrack(f.name.replace(/\.[^.]+$/, ''), buf, bytes);
+    } catch (e) { toast(`Couldn't decode ${f.name}. Unsupported format?`); }
+  }
+  busy(false);
+}
+
+// ---------- projects (.msproj = "MSPROJ01" + uint32 JSON length + JSON + original audio files) ----------
+const PROJ_MAGIC = 'MSPROJ01';
+function clearAll() { stop(); S.tracks.forEach(t => t.el.root.remove()); S.tracks = []; refreshLayout(); }
+async function saveProject() {
+  if (!S.tracks.length) return toast('Nothing to save yet');
+  const meta = { version: 1, master: S.m, exportName: $('#exName').value, preset: $('#preset').value,
+    tracks: S.tracks.map(t => { const o = {}; for (const k of TRACK_SAVED) o[k] = t[k]; o.nrApplied = !!t.proc; o.byteLength = t.bytes.size; return o; }) };
+  const json = new TextEncoder().encode(JSON.stringify(meta));
+  const len = new Uint8Array(4); new DataView(len.buffer).setUint32(0, json.length, true);
+  const blob = new Blob([PROJ_MAGIC, len, json, ...S.tracks.map(t => t.bytes)], { type: 'application/octet-stream' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = ($('#exName').value.trim() || 'project').replace(/[\\/:*?"<>|]/g, '_') + '.msproj';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+  toast(`Project saved (${(blob.size / 1e6).toFixed(1)} MB)`);
+}
+async function openProject(file) {
+  try {
+    const ab = await file.arrayBuffer();
+    if (new TextDecoder().decode(new Uint8Array(ab, 0, 8)) !== PROJ_MAGIC) throw new Error('not a Mastering Studio project');
+    const len = new DataView(ab).getUint32(8, true);
+    const meta = JSON.parse(new TextDecoder().decode(new Uint8Array(ab, 12, len)));
+    if (S.tracks.length && !confirm('Replace the current session with this project?')) return;
+    clearAll();
+    const c = ac(); let off = 12 + len;
+    for (const [i, tm] of meta.tracks.entries()) {
+      busy(`Loading ${tm.name}…`, i / meta.tracks.length);
+      const bytes = ab.slice(off, off + tm.byteLength); off += tm.byteLength;
+      const blob = new Blob([bytes]);
+      const t = addTrack(tm.name, await c.decodeAudioData(bytes), blob, tm);
+      if (tm.nrApplied) await applyNR(t, p => busy(`Re-applying noise reduction: ${tm.name}…`, p));
+    }
+    applyMaster({ ...MASTER_DEFAULT, ...meta.master });
+    if (meta.preset) $('#preset').value = meta.preset;
+    if (meta.exportName) $('#exName').value = meta.exportName;
+    S.tracks.forEach(t => drawWave(t));
+    toast(`Opened ${file.name}`);
+  } catch (e) { console.error(e); toast('Could not open project: ' + e.message); }
+  busy(false);
+}
+$('#saveBtn').onclick = saveProject;
+$('#openBtn').onclick = () => $('#projIn').click();
+$('#projIn').onchange = e => { if (e.target.files[0]) openProject(e.target.files[0]); e.target.value = ''; };
+$('#fileIn').onchange = e => { loadFiles(e.target.files); e.target.value = ''; };
+$('#addBtn').onclick = $('#addBtn2').onclick = () => $('#fileIn').click();
+let dragDepth = 0;
+addEventListener('dragenter', e => { e.preventDefault(); dragDepth++; document.body.classList.add('drag'); });
+addEventListener('dragleave', e => { if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove('drag'); } });
+addEventListener('dragover', e => e.preventDefault());
+addEventListener('drop', e => { e.preventDefault(); dragDepth = 0; document.body.classList.remove('drag'); if (e.dataTransfer.files.length) loadFiles(e.dataTransfer.files); });
+
+// ---------- demo session ----------
+function makeDemo() {
+  const c = ac(), sr = c.sampleRate, dur = 16, n = dur * sr, beat = 60 / 110;
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  const norm = (buf, pk) => { let m = 0; for (let ch = 0; ch < buf.numberOfChannels; ch++) for (const v of buf.getChannelData(ch)) m = Math.max(m, Math.abs(v)); for (let ch = 0; ch < buf.numberOfChannels; ch++) { const d = buf.getChannelData(ch); for (let i = 0; i < d.length; i++) d[i] *= pk / m; } return buf; };
+  // drums
+  const dr = c.createBuffer(2, n, sr), dL = dr.getChannelData(0), dR = dr.getChannelData(1);
+  for (let b = 0; b * beat < dur - 0.4; b++) {
+    const i0 = Math.floor(b * beat * sr);
+    if (b % 2 === 0 || b % 8 === 7) { let ph = 0; for (let i = 0; i < 0.4 * sr && i0 + i < n; i++) { const t = i / sr; ph += 2 * Math.PI * (48 + 110 * Math.exp(-t * 28)) / sr; const v = Math.sin(ph) * Math.exp(-t * 7); dL[i0 + i] += v; dR[i0 + i] += v; } }
+    if (b % 2 === 1) for (let i = 0; i < 0.25 * sr && i0 + i < n; i++) { const t = i / sr; const v = (Math.random() * 2 - 1) * Math.exp(-t * 16) * 0.45 + Math.sin(2 * Math.PI * 185 * t) * Math.exp(-t * 22) * 0.35; dL[i0 + i] += v * 0.9; dR[i0 + i] += v; }
+    for (const off of [0, 0.5]) { const j0 = Math.floor((b + off) * beat * sr); let last = 0; for (let i = 0; i < 0.06 * sr && j0 + i < n; i++) { const w = Math.random() * 2 - 1, v = (w - last) * Math.exp(-i / sr * 70) * 0.18; last = w; dL[j0 + i] += v * 0.6; dR[j0 + i] += v; } }
+  }
+  // bass
+  const bs = c.createBuffer(1, n, sr), bD = bs.getChannelData(0), notes = [45, 45, 41, 41, 48, 48, 43, 43];
+  for (let k = 0; k * 2 * beat < dur; k++) {
+    const f = mtof(notes[k % 8]), i0 = Math.floor(k * 2 * beat * sr), L = Math.floor(2 * beat * sr * 0.95);
+    for (let i = 0; i < L && i0 + i < n; i++) { const t = i / sr; let v = 0; for (let h = 1; h <= 6; h++) v += Math.sin(2 * Math.PI * f * h * t) / (h * h * 0.8); bD[i0 + i] = v * Math.min(1, t / 0.005) * Math.exp(-t * 1.2) * Math.min(1, (L - i) / 400); }
+  }
+  // keys: recorded with hiss + mains hum, with gaps so the noise profile can be learned
+  const ky = c.createBuffer(2, n, sr), kL = ky.getChannelData(0), kR = ky.getChannelData(1);
+  const chords = [[57, 60, 64, 69], [53, 57, 60, 65], [48, 52, 55, 60], [55, 59, 62, 67]];
+  for (let i = 0; i < n; i++) {
+    const t = i / sr, seg = Math.floor(t / (4 * beat)), ts = t - seg * 4 * beat;
+    const gap = t < 1.1 || (t > 8.1 && t < 8.75) || t > dur - 0.6;
+    let v = 0;
+    if (!gap) { const env = Math.min(1, ts / 0.08) * (0.55 + 0.45 * Math.exp(-ts * 1.5)); for (const m of chords[seg % 4]) { const f = mtof(m); v += (Math.sin(2 * Math.PI * f * t) + 0.3 * Math.sin(4 * Math.PI * f * t)) * env * 0.18; } }
+    const hiss = (Math.random() * 2 - 1) * 0.022, hum = 0.018 * Math.sin(2 * Math.PI * 60 * t) + 0.008 * Math.sin(2 * Math.PI * 120 * t);
+    kL[i] = v + hiss + hum; kR[i] = v * 0.92 + (Math.random() * 2 - 1) * 0.022 + hum;
+  }
+  const wav = b => { const chs = []; for (let i = 0; i < b.numberOfChannels; i++) chs.push(b.getChannelData(i)); return encodeWav(chs, b.sampleRate, 24, false); };
+  for (const [name, b, gain] of [['Drums', norm(dr, 0.8), -2], ['Bass', norm(bs, 0.7), 0], ['Keys (noisy)', norm(ky, 0.6), -5]])
+    addTrack(name, b, wav(b), { gain });
+  toast('Demo loaded. "Keys (noisy)" has hiss and 60 Hz hum: try NR and the hum filter in FX.', 5000);
+}
+$('#demoBtn').onclick = $('#demoBtn2').onclick = makeDemo;
+
+// ---------- top bar ----------
+$('#playBtn').onclick = () => S.playing ? pause() : play();
+$('#stopBtn').onclick = stop;
+$('#abBtn').onclick = () => {
+  S.bypass = !S.bypass; ac();
+  const now = ctx.currentTime;
+  RT.wet.gain.setTargetAtTime(S.bypass ? 0 : 1, now, 0.01); RT.dry.gain.setTargetAtTime(S.bypass ? 1 : 0, now, 0.01);
+  $('#abBtn').textContent = S.bypass ? 'A/B: Unprocessed' : 'A/B: Mastered';
+  $('#abBtn').classList.toggle('on', S.bypass);
+};
+$('#clearBtn').onclick = () => {
+  if (!S.tracks.length) return;
+  if (!confirm('Remove all tracks?')) return;
+  clearAll();
+};
+// tips bar: remembered per browser
+(() => {
+  const bar = $('#tips'), KEY = 'msTipsHidden';
+  let hidden = false; try { hidden = localStorage.getItem(KEY) === '1'; } catch (e) {}
+  const set = h => { bar.hidden = h; try { localStorage.setItem(KEY, h ? '1' : '0'); } catch (e) {} };
+  bar.hidden = hidden;
+  $('#tipsClose').onclick = () => set(true);
+  $('#tipsBtn').onclick = () => set(!bar.hidden);
+})();
+addEventListener('keydown', e => {
+  if (e.code !== 'Space' || document.querySelector('dialog[open]')) return;
+  const tg = e.target; if (tg.tagName === 'INPUT' && tg.type === 'text' || tg.tagName === 'SELECT' || tg.tagName === 'BUTTON') return;
+  e.preventDefault(); S.playing ? pause() : play();
+});
+// mute/solo changes should dim waveforms
+document.addEventListener('click', e => { if (e.target.matches('.btn.m, .btn.s')) S.tracks.forEach(drawWave); });
+
+buildMasterUI();
+</script>
+</body>
+</html>
